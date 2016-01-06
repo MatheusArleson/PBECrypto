@@ -2,6 +2,13 @@ package br.com.xavier.crypto.pbe;
 
 import javax.crypto.SecretKey;
 
+/**
+ * 
+ * Class to hold the information of an PBE Object.
+ * 
+ * @author Matheus Arleson Sales Xavier
+ *
+ */
 public class PBEStorage {
 	
 	//XXX STORAGE PROPERTIES
