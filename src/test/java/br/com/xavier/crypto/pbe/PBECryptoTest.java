@@ -1,40 +1,43 @@
 package br.com.xavier.crypto.pbe;
 
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 
-import org.apache.commons.codec.binary.Hex;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-
-import br.com.xavier.crypto.KeySize;
 
 public class PBECryptoTest {
 	
+	//XXX TEST SUBJECT
+	//private PBECrypto pbeCryto;
+	
+	//XXX TEST PROPERTIES
+	private char[] password;
+	
+	//XXX INITALIZATION METHODS
+	@Before
+	public void setup(){ 
+		password = "PASSWORD".toCharArray(); 
+	}
+	
+	//XXX DESTROY METHODS
+	@After
+	public void destroy(){}
+	
+	//XXX TEST METHODS
 	@Test
-	public void deveFuncionar(){
+	public void mustReturnSamePassword(){
 		try {
-			PBECrypto pbeCrypto = new PBECrypto(65536, KeySize.BITS_256, Charset.forName("UTF-8"));
-			
-			char[] password = {'S', 'E', 'N', 'H', 'A'};
-			System.out.println("#> ORIGINAL PASSWORD > " + new String(password));
+			PBECrypto pbeCrypto = PBECryptoFactory.getDefaultInstance();
 			
 			PBEStorage pbeStorage = pbeCrypto.encrypt(password);
-			
-			System.out.println("#> CIPHER TEXT	> " + toHexString(pbeStorage.getCipherText()));
-			System.out.println("#> IV 			> " + toHexString(pbeStorage.getInitializationVector()));
-			System.out.println("#> KEY 			> " + toHexString(pbeStorage.getKey().getEncoded()));
-			
 			char[] decrypted = pbeCrypto.decrypt(pbeStorage);
-			System.out.println("#> DECRYPTED PASSWORD > " + new String(decrypted));
+			
+			Assert.assertArrayEquals(password, decrypted);
 			
 		} catch (GeneralSecurityException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	private String toHexString(byte[] data){
-		return new String(Hex.encodeHex(data));
-	}
-	
 }
