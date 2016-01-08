@@ -9,7 +9,9 @@ import java.security.InvalidKeyException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidParameterSpecException;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
@@ -104,19 +106,21 @@ public class PBECrypto {
 	 */
 	public PBEStorage encrypt(char[] password) throws GeneralSecurityException {
 		SecretKey key = deriveKey(password);
-		configureCipher(CipherMode.ENCRYPT_MODE, key);
+		configureCipher(CipherMode.ENCRYPT_MODE, key, null);
 		byte[] iv = generateIV();
 		byte[] passwordBytes = convertToByteArray(password, charset);
-		byte[] ciphertext = cipher.doFinal(passwordBytes);
-
-		PBEStorage pbeStorage = new PBEStorage(iv, ciphertext, key);
-		return pbeStorage;
+		byte[] ciphertext = executeCipher(passwordBytes);
+		return generatePBEStorageInstance(iv, ciphertext, key);
 	}
-
-	private byte[] generateIV() throws InvalidParameterSpecException {
+	
+	protected byte[] generateIV() throws InvalidParameterSpecException {
 		AlgorithmParameters params = cipher.getParameters();
 		byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
 		return iv;
+	}
+	
+	protected PBEStorage generatePBEStorageInstance(byte[] initializationVector, byte[] cipherText, SecretKey key){
+		return new PBEStorage(initializationVector, cipherText, key);
 	}
 
 	/**
@@ -130,7 +134,7 @@ public class PBECrypto {
 	 * @return A {@link SecretKey} generated from a {@link PBEKeySpec} formated in AES.
 	 * @throws GeneralSecurityException if an exception occurs. Generic excetion wrapping the real exception.
 	 */
-	private SecretKey deriveKey(char[] password) throws GeneralSecurityException {
+	protected SecretKey deriveKey(char[] password) throws GeneralSecurityException {
 		byte[] salt = generateSalt();
 		PBEKeySpec spec = generatePBEKeySpec(password, salt, numberOfIterationsForKeyGeneration, keySize);
 		SecretKey rawKey = generateRawSecretKey(spec);
@@ -144,7 +148,7 @@ public class PBECrypto {
 	 * 
 	 * @return <b>byte[]</b> generated salt.
 	 */
-	private byte[] generateSalt() {
+	protected byte[] generateSalt() {
 		byte[] saltBytes = new byte[SALT_LENGTH];
 		secureRandomSaltGenerator.nextBytes(saltBytes);
 		return saltBytes;
@@ -160,7 +164,7 @@ public class PBECrypto {
 	 * @param keySize is the number of bits the key will have
 	 * @return {@link PBEKeySpec} instance
 	 */
-	private PBEKeySpec generatePBEKeySpec(char[] password, byte[] salt, int numberOfIterationsForKeyGeneration, KeySize keySize) {
+	protected PBEKeySpec generatePBEKeySpec(char[] password, byte[] salt, int numberOfIterationsForKeyGeneration, KeySize keySize) {
 		PBEKeySpec PBEKeySpec = new PBEKeySpec(password, salt, numberOfIterationsForKeyGeneration, keySize.getKeySize());
 		return PBEKeySpec;
 	}
@@ -173,7 +177,7 @@ public class PBECrypto {
 	 * @return {@link SecretKey} generated from the spec
 	 * @throws GeneralSecurityException if an exception occurs. Generic excetion wrapping the real exception.
 	 */
-	private SecretKey generateRawSecretKey(PBEKeySpec spec) throws GeneralSecurityException {
+	protected SecretKey generateRawSecretKey(PBEKeySpec spec) throws GeneralSecurityException {
 		SecretKey rawSecretKey = keyFactory.generateSecret(spec);
 		spec.clearPassword();
 		return rawSecretKey;
@@ -187,7 +191,7 @@ public class PBECrypto {
 	 * @param algorithm is and cryptography algorithm. 
 	 * @return {@link SecretKeySpec} an formated key.
 	 */
-	private SecretKeySpec formatKey(SecretKey rawKey, String algorithm) {
+	protected SecretKeySpec formatKey(SecretKey rawKey, String algorithm) {
 		return new SecretKeySpec(rawKey.getEncoded(), algorithm);
 	}
 
@@ -202,31 +206,34 @@ public class PBECrypto {
 	 */
 	public char[] decrypt(PBEStorage pbeStorage) throws GeneralSecurityException {
 		IvParameterSpec ivParameterSpec = new IvParameterSpec(pbeStorage.getInitializationVector());
-		cipher.init(Cipher.DECRYPT_MODE, pbeStorage.getKey(), ivParameterSpec);
-		byte[] decryptedContent = cipher.doFinal(pbeStorage.getCipherText());
+		configureCipher(CipherMode.DECRYPT_MODE, pbeStorage.getKey(), ivParameterSpec);
+		byte[] decryptedContent = executeCipher(pbeStorage.getCipherText());
 		return convertToCharArray(decryptedContent, charset);
 	}
 
-	//XXX COMMON METHODS
-	private void configureCipher(CipherMode cipherMode, SecretKey key) throws InvalidKeyException {
-		cipher.init(cipherMode.getMode(), key);
+	//XXX CIPHER METHODS
+	protected void configureCipher(CipherMode cipherMode, SecretKey key, IvParameterSpec ivSpec) throws GeneralSecurityException {
+		cipher.init(cipherMode.getMode(), key, ivSpec);
+	}
+	
+	protected byte[] executeCipher(byte[] data) throws GeneralSecurityException {
+		return cipher.doFinal(data);
 	}
 	
 	// XXX UTIL METHODS
-	private char[] convertToCharArray(byte[] byteArray, Charset charset) {
+	protected char[] convertToCharArray(byte[] byteArray, Charset charset) {
 		ByteBuffer bb = ByteBuffer.wrap(byteArray);
 		CharBuffer cb = charset.decode(bb);
 		return cb.array();
 	}
 
-	private byte[] convertToByteArray(char[] charArray, Charset charset) {
+	protected byte[] convertToByteArray(char[] charArray, Charset charset) {
 		CharBuffer cb = CharBuffer.wrap(charArray);
 		ByteBuffer bb = charset.encode(cb);
 		return bb.array();
 	}
 	
 	//XXX GETTERS
-	
 	/**
 	 * 
 	 * Gets the {@link Charset} passed in the constructor.
