@@ -5,9 +5,9 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.security.AlgorithmParameters;
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
+import java.security.InvalidKeyException;
 import java.security.SecureRandom;
-import java.security.spec.InvalidKeySpecException;
+import java.security.spec.InvalidParameterSpecException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -16,6 +16,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import br.com.xavier.crypto.CipherMode;
 import br.com.xavier.crypto.KeySize;
 
 /**
@@ -103,16 +104,21 @@ public class PBECrypto {
 	 */
 	public PBEStorage encrypt(char[] password) throws GeneralSecurityException {
 		SecretKey key = deriveKey(password);
-
-		cipher.init(Cipher.ENCRYPT_MODE, key);
-		AlgorithmParameters params = cipher.getParameters();
-		byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-		byte[] ciphertext = cipher.doFinal(convertToByteArray(password));
+		configureCipher(CipherMode.ENCRYPT_MODE, key);
+		byte[] iv = generateIV();
+		byte[] passwordBytes = convertToByteArray(password, charset);
+		byte[] ciphertext = cipher.doFinal(passwordBytes);
 
 		PBEStorage pbeStorage = new PBEStorage(iv, ciphertext, key);
 		return pbeStorage;
 	}
-	
+
+	private byte[] generateIV() throws InvalidParameterSpecException {
+		AlgorithmParameters params = cipher.getParameters();
+		byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+		return iv;
+	}
+
 	/**
 	 * 
 	 * Derive a {@link SecretKey} from the password, number of iterations and key size passed on constructor.
@@ -186,35 +192,67 @@ public class PBECrypto {
 	}
 
 	//XXX DECRYPT METHODS
+	/**
+	 * 
+	 * Decrypts a {@link PBEStorage} instance.
+	 * 
+	 * @param pbeStorage instance to be decrypted.
+	 * @return <b>char[]</b> original password
+	 * @throws GeneralSecurityException if an exception occurs. Generic excetion wrapping the real exception.
+	 */
 	public char[] decrypt(PBEStorage pbeStorage) throws GeneralSecurityException {
 		IvParameterSpec ivParameterSpec = new IvParameterSpec(pbeStorage.getInitializationVector());
 		cipher.init(Cipher.DECRYPT_MODE, pbeStorage.getKey(), ivParameterSpec);
 		byte[] decryptedContent = cipher.doFinal(pbeStorage.getCipherText());
-		return convertToCharArray(decryptedContent);
+		return convertToCharArray(decryptedContent, charset);
 	}
 
+	//XXX COMMON METHODS
+	private void configureCipher(CipherMode cipherMode, SecretKey key) throws InvalidKeyException {
+		cipher.init(cipherMode.getMode(), key);
+	}
+	
 	// XXX UTIL METHODS
-	private char[] convertToCharArray(byte[] byteArray) {
+	private char[] convertToCharArray(byte[] byteArray, Charset charset) {
 		ByteBuffer bb = ByteBuffer.wrap(byteArray);
 		CharBuffer cb = charset.decode(bb);
 		return cb.array();
 	}
 
-	private byte[] convertToByteArray(char[] charArray) {
+	private byte[] convertToByteArray(char[] charArray, Charset charset) {
 		CharBuffer cb = CharBuffer.wrap(charArray);
 		ByteBuffer bb = charset.encode(cb);
 		return bb.array();
 	}
 	
 	//XXX GETTERS
+	
+	/**
+	 * 
+	 * Gets the {@link Charset} passed in the constructor.
+	 * 
+	 * @return {@link Charset} in use.
+	 */
 	public Charset getCharset() {
 		return charset;
 	}
 	
+	/**
+	 * 
+	 * Gets the number of iterations passed in the constructor to generate the {@link SecretKey}. 
+	 * 
+	 * @return <b>Integer</b> number of iterations in use.
+	 */
 	public Integer getNumberOfIterationsForKeyGeneration() {
 		return numberOfIterationsForKeyGeneration;
 	}
 	
+	/**
+	 * 
+	 * Gets the {@link KeySize} passed in the constructor.
+	 * 
+	 * @return {@link KeySize} in use.
+	 */
 	public KeySize getKeySize() {
 		return keySize;
 	}

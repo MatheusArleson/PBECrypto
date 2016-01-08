@@ -1,10 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.com.xavier</groupId>
 	<artifactId>PBECrypto</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>br.com.xavier.crypto.pbe</name>
+	<version>1.0.0</version>
+	<name>PBECrypto</name>
+
 	<build>
 		<plugins>
 			<plugin>
@@ -17,30 +19,48 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<properties>
+    	<powermock.version>1.6.4</powermock.version>
+    	<junit.version>4.12</junit.version>
+    	<mockito.version>2.0.2-beta</mockito.version>
+	</properties>
 
 	<dependencies>
-	
-		<!-- LIBS  -->		
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
-		</dependency>
-		
-		<!-- TESTING -->		
+
+		<!-- LIBS -->
+
+		<!-- TESTING -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>${mockito.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
 		
 		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>2.0.2-beta</version>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 	</dependencies>
+	
+	<url>https://github.com/MatheusArleson/PBECrypto</url>
+	<description>Class to handle PBE Cryptography</description>
 </project>

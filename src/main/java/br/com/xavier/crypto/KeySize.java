@@ -1,5 +1,12 @@
 package br.com.xavier.crypto;
 
+/**
+ * 
+ * Enum to hold valid key sizes.
+ * 
+ * @author Matheus Arleson Sales Xavier
+ *
+ */
 public enum KeySize {
 	
 	//XXX ENUM MEMBERS

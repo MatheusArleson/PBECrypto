@@ -4,7 +4,7 @@ import javax.crypto.SecretKey;
 
 /**
  * 
- * Class to hold the information of an PBE Object.
+ * Class to hold the information of an encrypted PBE Object.
  * 
  * @author Matheus Arleson Sales Xavier
  *
