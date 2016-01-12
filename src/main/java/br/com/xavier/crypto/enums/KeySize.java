@@ -1,4 +1,4 @@
-package br.com.xavier.crypto;
+package br.com.xavier.crypto.enums;
 
 /**
  * 

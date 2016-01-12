@@ -9,7 +9,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import br.com.xavier.ArraysUtil;
-import br.com.xavier.crypto.CipherMode;
+import br.com.xavier.crypto.enums.CipherMode;
 
 /**
  * 
