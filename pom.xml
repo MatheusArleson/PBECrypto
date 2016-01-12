@@ -7,23 +7,25 @@
 	<version>1.0.0</version>
 	<name>PBECrypto</name>
 
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	<junit.version>4.12</junit.version>
+    	<mockito.version>2.0.2-beta</mockito.version>
+	</properties>
+
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
 			</plugin>
 		</plugins>
 	</build>
-	
-	<properties>
-    	<junit.version>4.12</junit.version>
-    	<mockito.version>2.0.2-beta</mockito.version>
-	</properties>
 
 	<dependencies>
 

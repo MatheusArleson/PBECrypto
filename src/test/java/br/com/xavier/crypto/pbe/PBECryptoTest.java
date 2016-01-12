@@ -1,19 +1,11 @@
 package br.com.xavier.crypto.pbe;
 
-import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
-
-import javax.crypto.SecretKey;
-import javax.crypto.spec.IvParameterSpec;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
-
-import br.com.xavier.crypto.CipherMode;
 
 public class PBECryptoTest {
 	
@@ -43,19 +35,39 @@ public class PBECryptoTest {
 	//EXECUTION TESTS
 	@Test
 	public void verifyEncryptCallOrder() throws GeneralSecurityException {
+//		PBECrypto pbeCrypto = PBECryptoFactory.getDefaultInstance();
+//		PBECrypto spy = Mockito.spy(pbeCrypto);
+//		
+//		spy.encrypt(password);
+//		
+//		InOrder inOrder = inOrder(spy);
+//		
+//		inOrder.verify(spy, times(1)).deriveKey(any(char[].class));
+//		inOrder.verify(spy, times(1)).configureCipher(any(CipherMode.class), any(SecretKey.class), isNull(IvParameterSpec.class));
+//		inOrder.verify(spy, times(1)).generateIV();
+//		inOrder.verify(spy, times(1)).convertToByteArray(any(), any(Charset.class));
+//		inOrder.verify(spy, times(1)).executeCipher(any(byte[].class));
+//		inOrder.verify(spy, times(1)).generatePBEStorageInstance(any(byte[].class), any(byte[].class), any(SecretKey.class));
+	}
+	
+	@Test
+	public void verifyDeriveKeyCallOrder() throws GeneralSecurityException {
+//		PBECrypto pbeCrypto = PBECryptoFactory.getDefaultInstance();
+//		PBECrypto spy = Mockito.spy(pbeCrypto);
+//		
+//		spy.deriveKey(password);
+//		
+//		InOrder inOrder = inOrder(spy);
+//		
+//		inOrder.verify(spy, times(1)).generateSalt();
+//		inOrder.verify(spy, times(1)).generatePBEKeySpec(any(char[].class), any(byte[].class), any(int.class), any(KeySize.class));
+//		inOrder.verify(spy, times(1)).generateRawSecretKey(any(PBEKeySpec.class));
+//		inOrder.verify(spy, times(1)).formatKey(any(SecretKey.class), any(String.class));
+	}
+	
+	@Test
+	public void verifyConfigureCipher() throws GeneralSecurityException {
 		PBECrypto pbeCrypto = PBECryptoFactory.getDefaultInstance();
-		PBECrypto spy = Mockito.spy(pbeCrypto);
-		
-		PBEStorage pbeStorage = spy.encrypt(password);
-		
-		InOrder inOrder = Mockito.inOrder(spy);
-		
-		inOrder.verify(spy).deriveKey(password);
-		inOrder.verify(spy).configureCipher(Mockito.any(CipherMode.class), Mockito.any(SecretKey.class), Mockito.isNull(IvParameterSpec.class));
-		inOrder.verify(spy).generateIV();
-		inOrder.verify(spy).convertToByteArray(password, pbeCrypto.getCharset());
-		//inOrder.verify(spy).executeCipher(passwordBytes);
-		
 		
 	}
 	

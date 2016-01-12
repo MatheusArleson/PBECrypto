@@ -9,7 +9,7 @@ public class PBECryptoFactory {
 
 	//XXX FACTORY METHODS
 	protected static PBECrypto getDefaultInstance() throws GeneralSecurityException{
-		return new PBECrypto(0, null, null);
+		return new PBECrypto(null);
 	}
 	
 }
