@@ -1,13 +1,11 @@
-package br.com.xavier;
+package br.com.xavier.util;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
-public class ArraysUtil {
+public abstract class ArraysUtil {
 
-	private ArraysUtil(){}
-	
 	public static char[] convertToCharArray(byte[] byteArray, Charset charset) {
 		ByteBuffer bb = ByteBuffer.wrap(byteArray);
 		CharBuffer cb = charset.decode(bb);
@@ -19,5 +17,4 @@ public class ArraysUtil {
 		ByteBuffer bb = charset.encode(cb);
 		return bb.array();
 	}
-	
 }

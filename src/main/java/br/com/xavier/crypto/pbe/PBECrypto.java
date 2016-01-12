@@ -8,8 +8,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
-import br.com.xavier.ArraysUtil;
 import br.com.xavier.crypto.enums.CipherMode;
+import br.com.xavier.util.ArraysUtil;
 
 /**
  * 
